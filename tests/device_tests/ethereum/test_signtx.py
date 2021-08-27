@@ -21,7 +21,7 @@ from trezorlib.debuglink import message_filters
 from trezorlib.exceptions import TrezorFailure
 from trezorlib.tools import parse_path
 
-from ..common import MNEMONIC12
+from ...common import MNEMONIC12
 
 TO_ADDR = "0x1d1c328764a41bda0492b66baa30c4a339ff85ef"
 
