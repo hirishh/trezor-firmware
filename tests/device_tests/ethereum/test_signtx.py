@@ -26,7 +26,7 @@ from ...common import MNEMONIC12
 TO_ADDR = "0x1d1c328764a41bda0492b66baa30c4a339ff85ef"
 
 
-def get_token_transfer_data(to_address: str, amount: str) -> bytes:
+def get_token_transfer_data(to_address: str, amount: int) -> bytes:
     """Generate data for transaction"""
     data = bytearray()
     # method id signalizing `transfer(address _to, uint256 _value)` function
@@ -34,7 +34,7 @@ def get_token_transfer_data(to_address: str, amount: str) -> bytes:
     # 1st function argument (to - the receiver)
     data.extend(bytes.fromhex(to_address))
     # 2nd function argument (value - amount to be transferred)
-    data.extend(bytes.fromhex(amount))
+    data.extend(amount.to_bytes(32, "big"))
 
     return data
 
@@ -46,19 +46,17 @@ VECTORS = (  # params
         {
             "data": get_token_transfer_data(
                 to_address="000000000000000000000000574bbb36871ba6b78e27f4b4dcfb76ea0091880b",
-                amount="000000000000000000000000000000000000000000000000000000000bebc200",
+                amount=200000000,
             ),
-            "to_address": "000000000000000000000000574bbb36871ba6b78e27f4b4dcfb76ea0091880b",
-            "amount_to_be_transferred": "000000000000000000000000000000000000000000000000000000000bebc200",
             "path": "44'/60'/0'/0/0",
-            "token_address": "0xd0d6d6c5fe4a677d343cc433536bb717bae167dd",
+            "to_address": "0xd0d6d6c5fe4a677d343cc433536bb717bae167dd",
             "chain_id": 1,
             "nonce": 0,
             "gas_price": 20,
             "gas_limit": 20,
             "tx_type": None,
             "value": 0,  # value needs to be 0, token value is set in the contract (data)
-            "sig_v": None,
+            "sig_v": 37,
             "sig_r_hex": "ec1df922115d256745410fbc2070296756583c8786e4d402a88d4e29ec513fa9",
             "sig_s_hex": "7001bfe3ba357e4a9f9e0d3a3f8a8962257615a4cf215db93e48b98999fc51b7",
         }
@@ -68,19 +66,17 @@ VECTORS = (  # params
         {
             "data": get_token_transfer_data(
                 to_address="000000000000000000000000574bbb36871ba6b78e27f4b4dcfb76ea0091880b",
-                amount="0000000000000000000000000000000000000000000000000000000000000123",
+                amount=291,
             ),
-            "to_address": "000000000000000000000000574bbb36871ba6b78e27f4b4dcfb76ea0091880b",
-            "amount_to_be_transferred": "0000000000000000000000000000000000000000000000000000000000000123",
             "path": "44'/60'/0'/0/1",
-            "token_address": "0xfc6b5d6af8a13258f7cbd0d39e11b35e01a32f93",
+            "to_address": "0xfc6b5d6af8a13258f7cbd0d39e11b35e01a32f93",
             "chain_id": 1,
             "nonce": 0,
             "gas_price": 20,
             "gas_limit": 20,
             "tx_type": None,
             "value": 0,  # value needs to be 0, token value is set in the contract (data)
-            "sig_v": None,
+            "sig_v": 38,
             "sig_r_hex": "2559bbf1bcb80992b6eaa96f0074b19606d8ea7bf4219e1c9ac64a12855c0cce",
             "sig_s_hex": "633a74429eb6d3aeec4ed797542236a85daab3cab15e37736b87a45697541d7a",
         }
@@ -90,14 +86,14 @@ VECTORS = (  # params
         {
             "data": None,
             "path": "44'/5718350'/0'/0/0",
-            "token_address": "0xd0d6d6c5fe4a677d343cc433536bb717bae167dd",
+            "to_address": "0xd0d6d6c5fe4a677d343cc433536bb717bae167dd",
             "chain_id": 1,
             "nonce": 0,
             "gas_price": 20,
             "gas_limit": 20,
             "tx_type": 1,
             "value": 100,
-            "sig_v": None,
+            "sig_v": 38,
             "sig_r_hex": "d6e197029031ec90b53ed14e8233aa78b592400513ac0386d2d55cdedc3d796f",
             "sig_s_hex": "326e0d600dd1b7ee606eb531b998a6a3b3293d4995fb8cfe0677962e8a43cff6",
         }
@@ -107,7 +103,7 @@ VECTORS = (  # params
         {
             "data": None,
             "path": "44'/60'/0'/0/100",
-            "token_address": TO_ADDR,
+            "to_address": TO_ADDR,
             "chain_id": None,
             "nonce": 0,
             "gas_price": 20,
@@ -124,7 +120,7 @@ VECTORS = (  # params
         {
             "data": None,
             "path": "44'/60'/0'/0/100",
-            "token_address": TO_ADDR,
+            "to_address": TO_ADDR,
             "chain_id": None,
             "nonce": 123456,
             "gas_price": 20000,
@@ -141,7 +137,7 @@ VECTORS = (  # params
         {
             "data": b"abcdefghijklmnop" * 16,
             "path": "44'/60'/0'/0/0",
-            "token_address": TO_ADDR,
+            "to_address": TO_ADDR,
             "chain_id": None,
             "nonce": 0,
             "gas_price": 20,
@@ -158,7 +154,7 @@ VECTORS = (  # params
         {
             "data": b"ABCDEFGHIJKLMNOP" * 256 + b"!!!",
             "path": "44'/60'/0'/0/0",
-            "token_address": TO_ADDR,
+            "to_address": TO_ADDR,
             "chain_id": None,
             "nonce": 123456,
             "gas_price": 20000,
@@ -170,24 +166,23 @@ VECTORS = (  # params
             "sig_s_hex": "60a77558f28d483d476f9507cd8a6a4bb47b86611aaff95fd5499b9ee9ebe7ee",
         }
     ),
-    # (
-    #     # test_ethereum_signtx_newcontract 2
-    #     # WARNING: IS FAILING - Signatures do not equal, even the "sig_v" is returned as 27
-    #     {
-    #         "data": b"ABCDEFGHIJKLMNOP" * 256 + b"!!!",
-    #         "path": "44'/60'/0'/0/0",
-    #         "token_address": "",
-    #         "chain_id": None,
-    #         "nonce": 123456,
-    #         "gas_price": 20000,
-    #         "gas_limit": 20000,
-    #         "tx_type": None,
-    #         "value": 12345678901234567890,
-    #         "sig_v": 28,
-    #         "sig_r_hex": "c86bda9de238b1c602648996561e7270a3be208da96bbf23474cb8e4014b9f93",
-    #         "sig_s_hex": "18742403f75a05e7fa9868c30b36f1e55628de02d01c03084c1ff6775a13137c",
-    #     }
-    # ),
+    (
+        # test_ethereum_signtx_newcontract 2
+        {
+            "data": b"ABCDEFGHIJKLMNOP" * 256 + b"!!!",
+            "path": "44'/60'/0'/0/0",
+            "to_address": "",
+            "chain_id": None,
+            "nonce": 123456,
+            "gas_price": 20000,
+            "gas_limit": 20000,
+            "tx_type": None,
+            "value": 12345678901234567890,
+            "sig_v": 28,
+            "sig_r_hex": "d825773761a4495b9f2f9d97aa3036a05a16f0822d16f75c300cfd6035d39ad1",
+            "sig_s_hex": "4669ffeda7558829eda78fa0de3bd25d295ecc0410c11eaecd5d19e187ff2feb",
+        }
+    ),
 )
 
 pytestmark = [pytest.mark.altcoin, pytest.mark.ethereum]
@@ -203,7 +198,7 @@ def test_ethereum_signtx(client, params):
             nonce=params["nonce"],
             gas_price=params["gas_price"],
             gas_limit=params["gas_limit"],
-            to=params["token_address"],
+            to=params["to_address"],
             chain_id=params["chain_id"],
             value=params["value"],
             tx_type=params["tx_type"],
@@ -212,8 +207,7 @@ def test_ethereum_signtx(client, params):
 
     assert sig_r.hex() == params["sig_r_hex"]
     assert sig_s.hex() == params["sig_s_hex"]
-    if params["sig_v"] is not None:
-        assert sig_v == params["sig_v"]
+    assert sig_v == params["sig_v"]
 
 
 @pytest.mark.setup_client(mnemonic=MNEMONIC12)
@@ -270,7 +264,6 @@ def test_ethereum_sanity_checks(client):
         )
 
 
-@pytest.mark.setup_client(mnemonic=MNEMONIC12)
 def test_data_streaming(client):
     """Only verifying the expected responses, the signatures are
     checked in vectorized function above.
@@ -287,14 +280,29 @@ def test_data_streaming(client):
                     signature_s=None,
                     signature_v=None,
                 ),
-                message_filters.EthereumTxRequest(data_length=1024),
-                message_filters.EthereumTxRequest(data_length=1024),
-                message_filters.EthereumTxRequest(data_length=3),
-                message_filters.EthereumTxRequest(),
+                message_filters.EthereumTxRequest(
+                    data_length=1024,
+                    signature_r=None,
+                    signature_s=None,
+                    signature_v=None,
+                ),
+                message_filters.EthereumTxRequest(
+                    data_length=1024,
+                    signature_r=None,
+                    signature_s=None,
+                    signature_v=None,
+                ),
+                message_filters.EthereumTxRequest(
+                    data_length=3,
+                    signature_r=None,
+                    signature_s=None,
+                    signature_v=None,
+                ),
+                message_filters.EthereumTxRequest(data_length=None),
             ]
         )
 
-        sig_v, sig_r, sig_s = ethereum.sign_tx(
+        ethereum.sign_tx(
             client,
             n=parse_path("44'/60'/0'/0/0"),
             nonce=0,
